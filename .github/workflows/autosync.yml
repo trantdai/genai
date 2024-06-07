@@ -1,0 +1,39 @@
+name: AutoSync Files
+
+# Controls when the action will run. Invokes the workflow on push events but only for the main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  AWS_REGION : "ap-southeast-2"
+
+# Permission can be added at job level or workflow level    
+permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+jobs:
+  AssumeRoleAndCallIdentity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::890878288978:role/GitHubActionsAssumeRoleForSelfServiceChatBot
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+      - name: Loop through files list
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo $file
+            aws s3 cp file s3://selfservice-chatbot
+          done
