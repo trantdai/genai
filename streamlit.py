@@ -20,7 +20,7 @@ def getAnswers(questions):
         retrieveAndGenerateConfiguration={
             'knowledgeBaseConfiguration': {
                 'knowledgeBaseId': '6QUSKLYVNI',
-                'modelArn': f'arn:aws:bedrock:{region}::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+                'modelArn': f'arn:aws:bedrock:{region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0'
             },
             'type': 'KNOWLEDGE_BASE'
         })
