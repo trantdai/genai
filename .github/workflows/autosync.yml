@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 env:
-  AWS_REGION : <"ap-southeast-2">
+  AWS_REGION : "ap-southeast-2"
 
 # Permission can be added at job level or workflow level    
 permissions:
