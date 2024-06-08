@@ -1,5 +1,5 @@
 import boto3
-import streamlit as st
+import selfservicebot as st
 import os
 from ghapi.all import GhApi
 import time
