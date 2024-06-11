@@ -5,7 +5,7 @@ from ghapi.all import GhApi
 import time
 import base64
 
-st.subheader('RAG Using Knowledge Base from Amazon Bedrock', divider='rainbow')
+st.subheader('GenAI-Powered Security Self-service Chatbot', divider='rainbow')
 
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
