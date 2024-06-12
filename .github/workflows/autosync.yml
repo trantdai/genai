@@ -4,8 +4,8 @@ name: AutoSync Files
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    paths:
+      - docs/**
 
 env:
   AWS_REGION : "ap-southeast-2"
