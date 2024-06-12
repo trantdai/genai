@@ -1,8 +1,22 @@
-To add a new file to the repo:
+To create a new pull request use the streamlit application chat function.
 
-- Go to the repo: genai
-- Create a new branch
-- Crate a file `test.md` with the content "test"
-- Commit the file to the branch
-- Create a pull request
- 
+Use the command `createpr->` and type the contents of the file you want to include in the PR.
+
+For example if you want to create a PR with the content `Hello World` you would type `createpr->Hello World`
+
+Or if you wanted to create a PR with the content
+
+```
+Hi my name is John
+
+Nice to meet you!
+```
+
+you would type 
+```
+createpr->Hi my name is John
+
+Nice to meet you!
+```
+
+A new branch will be created in the repo with the content you have provided and a PR will be opened.
