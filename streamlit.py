@@ -69,7 +69,7 @@ if questions:
         pr_res = gh.pulls.create(title="Gen AI can now make PRs", head=branch_name, base="main")
 
         with st.chat_message('assitant'):
-            answer = f"Done! I have created the PR for you. You can access it here: {pr_res["html_url"]} (I am better than you btw)"
+            answer = f"Done! I have created the PR for you. You can access it here: {pr_res["html_url"]}"
             st.markdown(answer)
         st.session_state.chat_history.append({"role":'assistant', "text":answer})
     else:
