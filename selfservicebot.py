@@ -28,8 +28,8 @@ if not github_pat:
 
 gh = GhApi(owner="trantdai", repo="genai", token=github_pat)
 
-def getAnswers(questions):
-    knowledgeBaseResponse  = bedrockClient.retrieve_and_generate(
+def get_answers_from_ai(questions):
+    knowledge_base_response  = bedrockClient.retrieve_and_generate(
         input={'text': questions},
         retrieveAndGenerateConfiguration={
             'knowledgeBaseConfiguration': {
@@ -38,7 +38,7 @@ def getAnswers(questions):
             },
             'type': 'KNOWLEDGE_BASE'
         })
-    return knowledgeBaseResponse
+    return knowledge_base_response
 
 if questions:
     with st.chat_message('user'):
@@ -73,7 +73,7 @@ if questions:
             st.markdown(answer)
         st.session_state.chat_history.append({"role":'assistant', "text":answer})
     else:
-        response = getAnswers(questions)
+        response = get_answers_from_ai(questions)
         # st.write(response)
         answer = response['output']['text']
 
