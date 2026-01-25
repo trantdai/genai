@@ -50,7 +50,7 @@ if questions:
             answer = "Sure let me create a PR for you. One moment..."
             st.markdown(answer)
         st.session_state.chat_history.append({"role":'assistant', "text":answer})
-        
+
         # get the main branch sha
         sha = gh.git.get_ref(ref="heads/main")["object"]["sha"]
 
@@ -69,7 +69,7 @@ if questions:
         pr_res = gh.pulls.create(title="Gen AI can now make PRs", head=branch_name, base="main")
 
         with st.chat_message('assitant'):
-            answer = f"Done! I have created the PR for you. You can access it here: {pr_res["html_url"]}"
+            answer = f"Done! I have created the PR for you. You can access it here: {pr_res['html_url']}"
             st.markdown(answer)
         st.session_state.chat_history.append({"role":'assistant', "text":answer})
     else:
@@ -88,11 +88,10 @@ if questions:
 
             context = response['citations'][0]['retrievedReferences'][0]['content']['text']
             doc_url = response['citations'][0]['retrievedReferences'][0]['location']['s3Location']['uri']
-            
+
             #Below lines are used to show the context and the document source for the latest Question Answer
             st.markdown(f"<span style='color:#FFDA33'>Context used: </span>{context}", unsafe_allow_html=True)
             st.markdown(f"<span style='color:#FFDA33'>Source Document: </span>{doc_url}", unsafe_allow_html=True)
-        
+
         else:
             st.markdown(f"<span style='color:red'>No Context</span>", unsafe_allow_html=True)
-        
