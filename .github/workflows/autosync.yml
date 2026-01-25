@@ -5,12 +5,12 @@ on:
   push:
     branches: [ main ]
     paths:
-      - docs/**
+      - apps/secbot/docs/**
 
 env:
   AWS_REGION : "ap-southeast-2"
 
-# Permission can be added at job level or workflow level    
+# Permission can be added at job level or workflow level
 permissions:
       id-token: write   # This is required for requesting the JWT
       contents: read    # This is required for actions/checkout

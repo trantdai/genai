@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Backend API Service (Production)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: todo-api-prod
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-WARNING}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - todo-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # MCP Server Service (Production)
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: todo-mcp-prod
+    ports:
+      - "${MCP_PORT:-8080}:8080"
+    environment:
+      - TODO_API_URL=http://api:8000
+      - LOG_LEVEL=${LOG_LEVEL:-WARNING}
+      - MCP_PORT=8080
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - todo-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  todo-network:
+    driver: bridge
