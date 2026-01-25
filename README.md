@@ -1,15 +1,55 @@
-# Exploring Generative AI in Security
+# GenAI Monorepo
 
-## GenAI Powered Security Self-Service Chatbot
+This repository contains multiple projects related to Generative AI exploration and implementation.
 
-### Introduction
+## Repository Structure
 
-This proof-of-concept (PoC) investigates the application of generative AI within the realm of security enablement and self-service. The primary objective is to harness the capabilities of generative AI alongside front-end chatbots to enhance the user experience for security consumers, particularly in extensive enterprise settings. By equipping these chatbots with specialized security knowledge, they can educate and mentor users on security principles, protocols, and procedures, ultimately facilitating their ability to independently address their security needs through GitOps workflows, such as managing git pull requests. While Cloudflare serves as an example of security technology utilized in this PoC, this methodology is broadly applicable across various self-service workflows that involve coding security configurations, compliance, and governance processes onto a version control system.
+```
+genai/
+├── apps/           # Application projects
+│   └── secbot/     # GenAI Powered Security Self-Service Chatbot
+└── mcp/            # Model Context Protocol (MCP) servers
+    └── todo-mcp-server/  # Todo MCP server implementation
+```
 
-### High Level Solution Architecture
+## Projects
 
-![High Level Solution Architecture](./resources/images/security_selfservice_chatbot_hlsa.png)
+### 🤖 SecBot - Security Self-Service Chatbot
 
-### References
+**Location:** [`apps/secbot/`](apps/secbot/)
 
-- [GenAI Powered Security Self-Service Chatbot Blog](https://trantdai.github.io/blog/genai-security-selfservice-chatbot)
+A proof-of-concept generative AI-powered chatbot designed to enhance security enablement and self-service in enterprise environments. The chatbot leverages specialized security knowledge to educate users on security principles, protocols, and procedures, enabling them to independently manage security configurations through GitOps workflows.
+
+**Key Features:**
+- AI-powered security guidance and mentoring
+- Integration with GitOps workflows
+- Self-service security configuration management
+- Enterprise-scale security enablement
+
+[Read more →](apps/secbot/README.md)
+
+### 🔧 MCP Servers
+
+**Location:** [`mcp/`](mcp/)
+
+Model Context Protocol (MCP) server implementations that extend AI capabilities through standardized interfaces.
+
+**Available Servers:**
+- **Todo MCP Server** - A reference implementation for task management via MCP
+
+[Explore MCP servers →](mcp/)
+
+## Getting Started
+
+Each project contains its own documentation and setup instructions. Navigate to the respective project directory to get started:
+
+- **SecBot Application:** See [`apps/secbot/README.md`](apps/secbot/README.md)
+- **MCP Servers:** See [`mcp/todo-mcp-server/README.md`](mcp/todo-mcp-server/README.md)
+
+## Contributing
+
+This is a personal exploration repository for Generative AI projects. Each project may have different contribution guidelines - please refer to the individual project documentation.
+
+## License
+
+See [LICENSE](LICENSE) file for details.

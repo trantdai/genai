@@ -1,3 +1,8 @@
+# Custom Section
+.vscode/
+.DS_Store
+# End of Custom Section
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
