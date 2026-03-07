@@ -133,6 +133,21 @@ app.include_router($0.router, prefix="/api", tags=["$0"])
 - Write comprehensive tests
 
 ## After Creating
-1. Run tests: `pytest tests/api/test_$0.py -v`
-2. Check API docs: Visit http://localhost:8000/docs
-3. Test manually: `curl http://localhost:8000/api/$0`
+
+### 1. Setup Virtual Environment (if not already done)
+```bash
+cd /Users/dai.tran/Developer/personal/genai/apps/claudeskills
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+### 2. Run Tests
+```bash
+source .venv/bin/activate  # Ensure venv is activated
+pytest tests/api/test_$0.py -v
+```
+
+### 3. Test the API
+- Check API docs: Visit http://localhost:8000/docs
+- Test manually: `curl http://localhost:8000/api/$0`

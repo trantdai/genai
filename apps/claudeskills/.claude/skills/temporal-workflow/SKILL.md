@@ -153,6 +153,23 @@ activities=[sample_activity],  # Add to existing list
 - Update worker registration
 
 ## After Creating
-1. Run tests: `pytest tests/workflows/test_$0_workflow.py -v`
-2. Check linting: `ruff check claudeskills/workflows/$0_workflow.py`
-3. Verify types: `mypy claudeskills/workflows/$0_workflow.py`
+
+### 1. Setup Virtual Environment (if not already done)
+```bash
+cd /Users/dai.tran/Developer/personal/genai/apps/claudeskills
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+### 2. Run Tests
+```bash
+source .venv/bin/activate  # Ensure venv is activated
+pytest tests/workflows/test_$0_workflow.py -v
+```
+
+### 3. Verify Code Quality
+```bash
+ruff check claudeskills/workflows/$0_workflow.py
+mypy claudeskills/workflows/$0_workflow.py
+```

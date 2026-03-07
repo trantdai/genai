@@ -7,6 +7,13 @@ from temporalio.worker import Worker
 
 from claudeskills.core.config import settings
 from claudeskills.core.logging import get_logger, setup_logging
+from claudeskills.workflows.data_processing_workflow import DataProcessingWorkflow
+from claudeskills.activities.data_processing_activities import (
+    validate_input,
+    transform_data,
+    store_results,
+    notify_completion,
+)
 
 logger = get_logger(__name__)
 
@@ -27,12 +34,17 @@ async def main() -> None:
         namespace=settings.temporal_namespace,
     )
 
-    # Create worker (activities and workflows to be added)
+    # Create worker with DataProcessing workflow and activities
     worker = Worker(
         client,
         task_queue=settings.temporal_task_queue,
-        workflows=[],  # Add workflow classes here
-        activities=[],  # Add activity functions here
+        workflows=[DataProcessingWorkflow],
+        activities=[
+            validate_input,
+            transform_data,
+            store_results,
+            notify_completion,
+        ],
     )
 
     logger.info("worker_started", task_queue=settings.temporal_task_queue)

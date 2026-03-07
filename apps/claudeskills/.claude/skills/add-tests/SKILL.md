@@ -59,8 +59,17 @@ async def test_workflow() -> None:
         pass
 ```
 
-5. **Run tests and verify coverage:**
+5. **Setup Virtual Environment (if not already done):**
 ```bash
+cd /Users/dai.tran/Developer/personal/genai/apps/claudeskills
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt -r requirements-dev.txt
+```
+
+6. **Run tests and verify coverage:**
+```bash
+source .venv/bin/activate  # Ensure venv is activated
 pytest tests/path/to/test_file.py -v --cov
 ```
 
