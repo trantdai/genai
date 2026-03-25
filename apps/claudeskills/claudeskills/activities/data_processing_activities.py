@@ -182,12 +182,22 @@ async def transform_data(
 
 
 @activity.defn
-async def store_results(data: dict[str, Any], user_id: str) -> dict[str, Any]:
-    """Store processed results.
+async def store_results(
+    data: dict[str, Any],
+    user_id: str,
+    workflow_id: str,
+    workflow_start_time: str,
+) -> dict[str, Any]:
+    """Store processed results with idempotency.
+
+    Uses workflow_id and workflow_start_time to create a deterministic storage
+    location. On retry, the same location is computed ensuring idempotent behavior.
 
     Args:
         data: Transformed data to store
         user_id: ID of user who owns this data
+        workflow_id: Unique workflow identifier
+        workflow_start_time: Workflow start time (ISO format) for idempotency
 
     Returns:
         dict containing storage location and metadata
@@ -198,26 +208,46 @@ async def store_results(data: dict[str, Any], user_id: str) -> dict[str, Any]:
         activity=activity_info.activity_type,
         attempt=activity_info.attempt,
         user_id=user_id,
+        workflow_id=workflow_id,
         record_id=data.get("id"),
     )
 
     try:
-        # Simulate storage operation
-        await asyncio.sleep(0.8)
+        # Create deterministic storage location using workflow identifiers
+        # This ensures idempotency - retries will compute the same location
+        storage_location = (
+            f"storage://user_{user_id}/"
+            f"workflow_{workflow_id}/"
+            f"data_{data.get('id')}"
+        )
 
-        # In real implementation, this would write to database/S3/etc.
-        storage_location = f"storage://user_{user_id}/data_{data.get('id')}"
+        # Log retry attempts for monitoring
+        if activity_info.attempt > 1:
+            logger.info(
+                "activity_retry_detected",
+                attempt=activity_info.attempt,
+                workflow_id=workflow_id,
+                storage_location=storage_location,
+            )
+
+        # Simulate storage operation
+        # In real implementation:
+        # - Check if storage_location already exists
+        # - If exists and activity is retrying, return existing result (idempotent)
+        # - If not exists, write data to storage
+        await asyncio.sleep(0.8)
 
         logger.info(
             "activity_completed",
             activity=activity_info.activity_type,
             location=storage_location,
             record_id=data.get("id"),
+            workflow_id=workflow_id,
         )
 
         return {
             "location": storage_location,
-            "stored_at": activity_info.current_attempt_scheduled_time.isoformat(),
+            "stored_at": workflow_start_time,  # Use workflow time, not activity time
             "size_bytes": len(str(data)),
         }
 
@@ -227,6 +257,7 @@ async def store_results(data: dict[str, Any], user_id: str) -> dict[str, Any]:
             activity=activity_info.activity_type,
             error=str(e),
             user_id=user_id,
+            workflow_id=workflow_id,
         )
         raise ApplicationError(f"Storage activity failed: {e}")
 
@@ -236,7 +267,7 @@ async def notify_completion(
     user_id: str,
     workflow_id: str,
     storage_location: str,
-) -> dict[str, bool]:
+) -> dict[str, str | bool]:
     """Send completion notification to user.
 
     Args:
@@ -245,7 +276,7 @@ async def notify_completion(
         storage_location: Where results are stored
 
     Returns:
-        dict with success status
+        dict with success status and message
     """
     activity_info = activity.info()
     logger.info(

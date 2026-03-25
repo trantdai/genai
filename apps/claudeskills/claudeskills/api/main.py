@@ -58,10 +58,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Register routers (to be implemented)
-    # from claudeskills.api.routes import health, workflows
-    # app.include_router(health.router, tags=["health"])
-    # app.include_router(workflows.router, prefix="/workflows", tags=["workflows"])
+    # Register routers
+    from claudeskills.api.routes import workflows
+
+    app.include_router(workflows.router, prefix="/api", tags=["workflows"])
 
     return app
 

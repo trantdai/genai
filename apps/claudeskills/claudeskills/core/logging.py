@@ -38,7 +38,7 @@ def setup_logging(log_level: str = "INFO") -> None:
     )
 
 
-def get_logger(name: str) -> structlog.BoundLogger:
+def get_logger(name: str) -> structlog.stdlib.BoundLogger:
     """Get a logger instance with the given name.
 
     Args:
@@ -47,4 +47,4 @@ def get_logger(name: str) -> structlog.BoundLogger:
     Returns:
         Configured logger instance
     """
-    return structlog.get_logger(name)
+    return structlog.get_logger(name)  # type: ignore[no-any-return]
