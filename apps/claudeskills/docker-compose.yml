@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # Temporal Server
+  temporal:
+    image: temporalio/auto-setup:1.22.4
+    container_name: claudeskills-temporal
+    ports:
+      - "7233:7233"  # gRPC
+      - "8233:8233"  # Web UI
+    environment:
+      - DB=postgresql
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+    depends_on:
+      - postgresql
+    networks:
+      - claudeskills-network
+
+  # PostgreSQL for Temporal
+  postgresql:
+    image: postgres:15-alpine
+    container_name: claudeskills-postgres
+    environment:
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    ports:
+      - "5432:5432"
+    volumes:
+      - temporal-postgres-data:/var/lib/postgresql/data
+    networks:
+      - claudeskills-network
+
+  # FastAPI Application (optional - for Docker-based development)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claudeskills-api
+    ports:
+      - "8000:8000"
+    environment:
+      - TEMPORAL_HOST=temporal
+      - TEMPORAL_PORT=7233
+      - LOG_LEVEL=INFO
+    env_file:
+      - .env
+    depends_on:
+      - temporal
+    volumes:
+      - ./claudeskills:/app/claudeskills
+      - ./tests:/app/tests
+    networks:
+      - claudeskills-network
+    command: uvicorn claudeskills.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Temporal Worker (optional - for Docker-based development)
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claudeskills-worker
+    environment:
+      - TEMPORAL_HOST=temporal
+      - TEMPORAL_PORT=7233
+      - LOG_LEVEL=INFO
+    env_file:
+      - .env
+    depends_on:
+      - temporal
+    volumes:
+      - ./claudeskills:/app/claudeskills
+    networks:
+      - claudeskills-network
+    command: python -m claudeskills.worker.main
+
+volumes:
+  temporal-postgres-data:
+
+networks:
+  claudeskills-network:
+    driver: bridge
