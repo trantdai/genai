@@ -1,0 +1,427 @@
+# .rooignore - Exclude files from AI context
+# This file uses gitignore syntax to exclude files/directories from being sent to AI assistants
+# Best practices: Exclude large files, generated code, dependencies, secrets, and binary files
+
+# ============================================================================
+# SECURITY & SECRETS - CRITICAL
+# ============================================================================
+# Never send sensitive files to AI context
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.der
+*.pub
+id_rsa*
+*.asc
+*.gpg
+secrets/
+credentials/
+.aws/
+.azure/
+.gcloud/
+.kube/config
+*.credentials
+*_credentials.json
+service-account*.json
+
+# ============================================================================
+# DEPENDENCIES & PACKAGES - HIGH PRIORITY
+# ============================================================================
+# Exclude dependency directories (large, auto-generated, not useful for AI)
+node_modules/
+bower_components/
+jspm_packages/
+vendor/
+.pnp/
+.pnp.js
+
+# Python
+venv/
+.venv/
+env/
+ENV/
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+__pypackages__/
+.pip-cache/
+pip-log.txt
+
+# Ruby
+.bundle/
+vendor/bundle/
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Java/Kotlin
+.gradle/
+build/
+.mvn/
+target/
+
+# PHP
+vendor/
+composer.phar
+
+# .NET
+bin/
+obj/
+packages/
+*.nupkg
+
+# ============================================================================
+# BUILD ARTIFACTS & COMPILED CODE
+# ============================================================================
+# Exclude compiled/generated files (not source code)
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.class
+*.jar
+*.war
+*.ear
+*.o
+*.obj
+*.a
+*.lib
+*.wasm
+
+# Build directories
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+
+# ============================================================================
+# GENERATED CODE & ARTIFACTS
+# ============================================================================
+# Exclude auto-generated code (not manually written)
+*_pb2.py
+*_pb2_grpc.py
+*.pb.go
+*.generated.*
+*.gen.*
+*-generated.*
+*.auto.*
+.generated/
+generated/
+gen/
+
+# GraphQL
+__generated__/
+*.graphql.ts
+
+# Prisma
+.prisma/client/
+
+# TypeScript
+*.d.ts.map
+*.js.map
+
+# ============================================================================
+# LARGE DATA FILES & DATABASES
+# ============================================================================
+# Exclude large files that don't need AI analysis
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.mdb
+*.accdb
+*.sql
+*.dump
+*.bak
+*.backup
+
+# Data files
+*.csv
+*.tsv
+*.parquet
+*.avro
+*.jsonl
+*.ndjson
+data/
+datasets/
+*.feather
+*.h5
+*.hdf5
+
+# ============================================================================
+# MEDIA & BINARY FILES
+# ============================================================================
+# Exclude binary files (not text-based, not useful for AI)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+*.svg
+*.webp
+*.tiff
+*.psd
+*.ai
+*.sketch
+
+# Video
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+
+# Audio
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.wma
+*.m4a
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+
+# Documents (often large, not code)
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+
+# ============================================================================
+# LOGS & TEMPORARY FILES
+# ============================================================================
+# Exclude logs and temp files (noisy, not useful)
+*.log
+logs/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test coverage
+coverage/
+.coverage
+.coverage.*
+htmlcov/
+.nyc_output/
+lcov.info
+*.lcov
+
+# ============================================================================
+# IDE & EDITOR FILES
+# ============================================================================
+# Exclude IDE-specific files (not project code)
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vs/
+*.code-workspace
+
+# ============================================================================
+# VERSION CONTROL & CI/CD
+# ============================================================================
+# Exclude VCS directories (not needed in AI context)
+.git/
+.svn/
+.hg/
+.bzr/
+
+# CI/CD artifacts
+.github/workflows/*.log
+.gitlab-ci-local/
+.circleci/
+
+# ============================================================================
+# CACHE & OPTIMIZATION
+# ============================================================================
+# Exclude cache directories (auto-generated)
+.cache/
+.parcel-cache/
+.turbo/
+.webpack/
+.rollup.cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Python cache
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+.pytype/
+.ruff_cache/
+
+# ============================================================================
+# DOCUMENTATION BUILD OUTPUT
+# ============================================================================
+# Exclude generated documentation (not source)
+docs/_build/
+docs/.doctrees/
+site/
+_site/
+.docusaurus/
+.vuepress/dist/
+.vitepress/dist/
+
+# ============================================================================
+# TESTING & MOCKING
+# ============================================================================
+# Exclude test fixtures and mock data (can be large)
+fixtures/
+mocks/
+__mocks__/
+test-results/
+playwright-report/
+.playwright/
+
+# ============================================================================
+# PACKAGE MANAGER LOCKS (OPTIONAL)
+# ============================================================================
+# Uncomment if you want to exclude lock files (they're large but sometimes useful)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# poetry.lock
+# Pipfile.lock
+# Gemfile.lock
+# composer.lock
+# go.sum
+# Cargo.lock
+
+# ============================================================================
+# LARGE VENDOR/THIRD-PARTY CODE
+# ============================================================================
+# Exclude vendored/copied third-party code
+third_party/
+3rdparty/
+external/
+libs/
+static/vendor/
+public/vendor/
+
+# ============================================================================
+# MINIFIED & BUNDLED CODE
+# ============================================================================
+# Exclude minified files (not readable, not useful)
+*.min.js
+*.min.css
+*.bundle.js
+*.chunk.js
+*.bundle.css
+
+# ============================================================================
+# LANGUAGE-SPECIFIC PATTERNS
+# ============================================================================
+
+# JavaScript/TypeScript
+.eslintcache
+.tsbuildinfo
+*.tsbuildinfo
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+
+# Ruby
+*.gem
+.bundle/
+Gemfile.lock
+
+# Go
+go.work
+go.work.sum
+
+# Rust
+Cargo.lock
+target/
+
+# Java
+*.class
+.gradle/
+gradle-app.setting
+.gradletasknamecache
+
+# C/C++
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# ============================================================================
+# CUSTOM PROJECT PATTERNS
+# ============================================================================
+# Add your project-specific patterns below
+# Example:
+# my-large-dataset/
+# legacy-code/
+# experimental/
