@@ -9,7 +9,7 @@ API Security Scanner is a Python CLI tool for detecting security vulnerabilities
 **Current Status:** Documentation phase complete (PRD + Technical Specs Part 1-2). Implementation not yet started.
 
 **Technology Stack:**
-- Python 3.11+ (async/await, type hints)
+- Python 3.13+ (async/await, type hints)
 - httpx (async HTTP client)
 - Pydantic (data validation)
 - Click (CLI framework)
@@ -142,7 +142,7 @@ CLI Layer → Scanner Engine → Vulnerability Checkers → HTTP Client
 
 ### Type Hints Standards
 - Full type hints required (mypy strict mode)
-- Use `list[Type]` not `List[Type]` (Python 3.11+)
+- Use `list[Type]` not `List[Type]` (Python 3.13+)
 - Use `Type | None` not `Optional[Type]`
 - Protocol classes for interfaces, not ABCs
 - Pydantic models for data validation
@@ -216,7 +216,7 @@ Read these documents before implementing features to understand the complete des
 ## Dependencies Management
 
 All dependencies specified in `pyproject.toml`:
-- Use `requires-python = ">=3.11"`
+- Use `requires-python = ">=3.13"`
 - Pin major versions for stability
 - Separate `[project.optional-dependencies]` for dev tools
 - Run `pip-audit` to check for vulnerabilities

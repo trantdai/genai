@@ -75,7 +75,7 @@ API Security Scanner is a command-line tool that automates security vulnerabilit
 **Resource Constraints:**
 - Maximum 100MB memory usage
 - Maximum 50MB report file size
-- Minimum Python 3.11 required
+- Minimum Python 3.13 required
 
 **Security Constraints:**
 - No credential storage
@@ -276,7 +276,7 @@ API Security Scanner is a command-line tool that automates security vulnerabilit
 ### 3.1 Core Technologies
 
 #### Programming Language
-- **Python 3.11+**
+- **Python 3.13+**
   - Rationale: Modern async support, type hints, performance
   - Features used: async/await, type hints, dataclasses
 
@@ -302,14 +302,14 @@ API Security Scanner is a command-line tool that automates security vulnerabilit
 # pyproject.toml
 [tool.black]
 line-length = 100
-target-version = ['py311']
+target-version = ['py313']
 
 [tool.ruff]
 line-length = 100
 select = ["E", "F", "I", "N", "W", "UP"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 strict = true
 ```
 
@@ -330,7 +330,7 @@ strict = true
 [project]
 name = "api-security-scanner"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 
 dependencies = [
     "httpx>=0.25.0",

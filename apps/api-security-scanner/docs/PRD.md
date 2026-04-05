@@ -350,7 +350,7 @@ mypy>=1.6.0            # Type checking
 
 ### System Requirements
 
-- Python 3.11+
+- Python 3.13+
 - pip or uv package manager
 - Internet connection (for remote API scans)
 - 100MB disk space
