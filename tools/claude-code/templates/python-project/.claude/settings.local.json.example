@@ -1,0 +1,317 @@
+{
+  "_comment": "This is a template for local settings overrides. Copy to settings.local.json and customize for your environment.",
+  "_instructions": "Remove this comment section when creating your actual settings.local.json file",
+
+  "permissions": {
+    "command_execution": {
+      "timeout_seconds": 600,
+      "_comment": "Increase timeout for slower development machines"
+    },
+    "network_access": {
+      "allow_external": true,
+      "_comment": "Enable external network access for package downloads and API calls",
+      "allowed_domains": [
+        "pypi.org",
+        "files.pythonhosted.org",
+        "github.com",
+        "raw.githubusercontent.com",
+        "stackoverflow.com",
+        "docs.python.org",
+        "fastapi.tiangolo.com",
+        "your-private-registry.com"
+      ]
+    },
+    "browser_access": {
+      "enabled": true,
+      "allow_file_urls": true,
+      "_comment": "Enable browser access for documentation and coverage reports"
+    }
+  },
+
+  "command_restrictions": {
+    "allowed_commands": [
+      "code",
+      "nano",
+      "vim",
+      "emacs",
+      "htop",
+      "ps",
+      "df",
+      "free",
+      "lsof",
+      "netstat",
+      "ssh",
+      "scp",
+      "rsync",
+      "tmux",
+      "screen",
+      "jupyter",
+      "ipython",
+      "conda",
+      "mamba",
+      "pyenv",
+      "pipx",
+      "uv",
+      "pdm",
+      "rye"
+    ],
+    "_comment": "Add project-specific commands that are safe for your environment"
+  },
+
+  "file_restrictions": {
+    "editable_patterns": [
+      "src/**/*.py",
+      "app/**/*.py",
+      "lib/**/*.py",
+      "scripts/*.py",
+      "scripts/*.sh",
+      "config/*.yaml",
+      "config/*.json",
+      ".vscode/*.json",
+      ".idea/*.xml",
+      "*.sql"
+    ],
+    "forbidden_patterns": [
+      "/home/username/.ssh/*",
+      "/home/username/.aws/*",
+      "/home/username/.gcp/*",
+      "production.env",
+      "staging.env",
+      "*.backup",
+      "*.dump"
+    ],
+    "max_file_size_mb": 25,
+    "_comment": "Increase file size limit for your development needs"
+  },
+
+  "environment_variables": {
+    "allowed_read": [
+      "EDITOR",
+      "PAGER",
+      "BROWSER",
+      "DISPLAY",
+      "SSH_AUTH_SOCK",
+      "GPG_AGENT_INFO",
+      "DOCKER_HOST",
+      "KUBECONFIG",
+      "DEVELOPMENT_MODE",
+      "DEBUG",
+      "LOG_LEVEL",
+      "YOUR_PROJECT_*",
+      "DEV_*"
+    ],
+    "allowed_set": [
+      "DEBUG",
+      "LOG_LEVEL",
+      "DEVELOPMENT_MODE",
+      "TESTING_MODE"
+    ]
+  },
+
+  "custom_tools": {
+    "custom_formatter": {
+      "command": "ruff",
+      "args": ["format", "--line-length", "120"],
+      "auto_run": false,
+      "file_patterns": ["*.py"],
+      "_comment": "Override formatter settings for your preferences"
+    },
+    "custom_linter": {
+      "command": "ruff",
+      "args": ["check", "--fix", "--extend-select", "I,N,D,UP,ANN"],
+      "auto_run": false,
+      "file_patterns": ["*.py"],
+      "_comment": "Add additional linting rules you prefer"
+    },
+    "database_migration": {
+      "command": "alembic",
+      "args": ["upgrade", "head"],
+      "auto_run": false,
+      "file_patterns": ["alembic/versions/*.py"],
+      "_comment": "Custom tool for database migrations"
+    },
+    "api_docs_server": {
+      "command": "mkdocs",
+      "args": ["serve", "--dev-addr", "localhost:8001"],
+      "auto_run": false,
+      "file_patterns": ["docs/*.md"],
+      "_comment": "Serve documentation locally"
+    },
+    "jupyter_lab": {
+      "command": "jupyter",
+      "args": ["lab", "--ip=0.0.0.0", "--no-browser"],
+      "auto_run": false,
+      "file_patterns": ["*.ipynb"],
+      "_comment": "Launch Jupyter Lab for data analysis"
+    }
+  },
+
+  "mcp_servers": {
+    "local_database": {
+      "enabled": false,
+      "config": {
+        "connection_string": "sqlite:///local_dev.db",
+        "read_only": true,
+        "_comment": "Enable for local database access"
+      }
+    },
+    "api_client": {
+      "enabled": false,
+      "config": {
+        "base_url": "http://localhost:8000",
+        "timeout": 30,
+        "auth_header": "Bearer YOUR_DEV_TOKEN_HERE",
+        "_comment": "Configure for local API testing"
+      }
+    },
+    "cloud_storage": {
+      "enabled": false,
+      "config": {
+        "provider": "aws",
+        "bucket": "your-dev-bucket",
+        "region": "us-east-1",
+        "_comment": "Configure for cloud storage access in development"
+      }
+    }
+  },
+
+  "code_analysis": {
+    "thresholds": {
+      "max_complexity": 20,
+      "max_function_length": 75,
+      "max_class_methods": 30,
+      "max_file_length": 1500,
+      "_comment": "Relaxed thresholds for development environment"
+    }
+  },
+
+  "auto_formatting": {
+    "enabled": true,
+    "on_save": true,
+    "_comment": "Enable auto-formatting for convenience in development",
+    "tools": ["ruff format", "ruff check --fix"]
+  },
+
+  "testing": {
+    "coverage_threshold": 70,
+    "_comment": "Lower threshold for development, increase for CI/CD",
+    "parallel_execution": true,
+    "test_patterns": [
+      "test_*.py",
+      "*_test.py",
+      "tests/**/*.py",
+      "integration_tests/**/*.py"
+    ],
+    "pytest_args": [
+      "-v",
+      "--tb=short",
+      "--strict-markers",
+      "--cov-report=html",
+      "--cov-report=term-missing"
+    ]
+  },
+
+  "security": {
+    "scan_on_change": false,
+    "_comment": "Disable for faster development, enable for production builds",
+    "secret_detection": {
+      "enabled": true,
+      "exclude_patterns": [
+        "tests/fixtures/*",
+        "examples/*",
+        "docs/*"
+      ]
+    }
+  },
+
+  "integrations": {
+    "docker": {
+      "auto_build": true,
+      "build_args": {
+        "BUILDKIT_INLINE_CACHE": "1",
+        "DEVELOPMENT": "true"
+      }
+    },
+    "git": {
+      "auto_stage_formatted": true,
+      "_comment": "Auto-stage formatted files for convenience",
+      "hooks": {
+        "pre_commit": [
+          "ruff format .",
+          "ruff check --fix .",
+          "mypy .",
+          "pytest tests/unit/"
+        ]
+      }
+    }
+  },
+
+  "performance": {
+    "max_concurrent_tasks": 8,
+    "memory_limit_mb": 2048,
+    "_comment": "Increase limits for powerful development machines"
+  },
+
+  "logging": {
+    "level": "DEBUG",
+    "file": "/tmp/claude-dev.log",
+    "_comment": "More verbose logging for development"
+  },
+
+  "ui_preferences": {
+    "verbose_mode": true,
+    "show_progress": true,
+    "confirm_destructive": false,
+    "_comment": "Less confirmation prompts for faster development"
+  },
+
+  "development": {
+    "_comment": "Development-specific settings",
+    "hot_reload": true,
+    "debug_mode": true,
+    "profile_performance": false,
+    "mock_external_apis": true,
+    "use_test_database": true,
+    "enable_debug_toolbar": true
+  },
+
+  "personal_preferences": {
+    "_comment": "Your personal development preferences",
+    "preferred_editor": "code",
+    "terminal_theme": "dark",
+    "notification_level": "errors_only",
+    "auto_save_interval": 30,
+    "backup_enabled": true,
+    "backup_location": "~/.claude/backups"
+  },
+
+  "project_specific": {
+    "_comment": "Override these for specific projects",
+    "python_version": "3.11",
+    "package_manager": "poetry",
+    "virtual_env_path": ".venv",
+    "src_directory": "src",
+    "test_directory": "tests",
+    "docs_directory": "docs",
+    "requirements_file": "pyproject.toml"
+  },
+
+  "api_keys": {
+    "_comment": "NEVER commit actual API keys. These are placeholders only.",
+    "_warning": "Replace placeholders with actual values and keep this file gitignored",
+    "openai_api_key": "YOUR_OPENAI_API_KEY_HERE",
+    "github_token": "YOUR_GITHUB_TOKEN_HERE",
+    "docker_registry_token": "YOUR_DOCKER_REGISTRY_TOKEN_HERE",
+    "sonarqube_token": "YOUR_SONARQUBE_TOKEN_HERE"
+  },
+
+  "local_paths": {
+    "_comment": "Customize paths for your local environment",
+    "python_executable": "/usr/local/bin/python3.11",
+    "venv_base_path": "~/.virtualenvs",
+    "cache_directory": "~/.cache/claude",
+    "temp_directory": "/tmp/claude-workspace",
+    "backup_directory": "~/.claude/backups",
+    "log_directory": "~/.claude/logs"
+  }
+}
