@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "pre-tool-use",
+  "description": "Validation hooks before Claude Code uses tools",
+  "hooks": [
+    {
+      "name": "validate-python-syntax",
+      "trigger": "before:write_to_file",
+      "conditions": {
+        "file_pattern": "\\.py$"
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "python3 -m py_compile ${file_path}",
+          "on_failure": "warn"
+        }
+      ]
+    },
+    {
+      "name": "check-file-size",
+      "trigger": "before:write_to_file",
+      "conditions": {
+        "file_size_gt": 1048576
+      },
+      "actions": [
+        {
+          "type": "prompt",
+          "message": "File >1MB. Continue?",
+          "on_decline": "abort"
+        }
+      ]
+    },
+    {
+      "name": "prevent-secrets",
+      "trigger": "before:write_to_file",
+      "conditions": {
+        "content_pattern": "(AKIA[0-9A-Z]{16}|ghp_[0-9a-zA-Z]{36}|-----BEGIN.*PRIVATE KEY-----|api[_-]?key.*['\"]([a-zA-Z0-9]{32,})['\"]|password.*=.*['\"](.+)['\"])"
+      },
+      "actions": [
+        {
+          "type": "prompt",
+          "message": "Secret detected. Abort?",
+          "on_decline": "continue"
+        }
+      ]
+    },
+    {
+      "name": "check-destructive",
+      "trigger": "before:execute_command",
+      "conditions": {
+        "command_pattern": "(rm -rf|DROP DATABASE|DELETE FROM|--force|git reset --hard)"
+      },
+      "actions": [
+        {
+          "type": "prompt",
+          "message": "Destructive command. Continue?",
+          "on_decline": "abort"
+        }
+      ]
+    },
+    {
+      "name": "prevent-production",
+      "trigger": "before:execute_command",
+      "conditions": {
+        "command_pattern": "(deploy|kubectl apply|terraform apply)",
+        "file_pattern": "\\.(prod|production)\\..*$"
+      },
+      "actions": [
+        {
+          "type": "prompt",
+          "message": "Production operation. Confirm?",
+          "on_decline": "abort",
+          "require_confirmation": true
+        }
+      ]
+    }
+  ],
+  "configuration": {
+    "enabled": true,
+    "timeout_seconds": 30
+  }
+}
