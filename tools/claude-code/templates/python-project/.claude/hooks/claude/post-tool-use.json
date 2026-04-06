@@ -1,35 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "name": "post-tool-use",
-  "description": "Automation hooks executed after Claude Code uses tools",
-  "version": "1.0.0",
+  "description": "Automation hooks after Claude Code uses tools",
   "hooks": [
     {
       "name": "auto-format-python",
-      "description": "Automatically format Python files after modification",
-      "trigger": "after:write_to_file",
-      "conditions": {
-        "file_pattern": "\\.py$",
-        "operation": "write"
-      },
-      "actions": [
-        {
-          "type": "command",
-          "command": "black ${file_path}",
-          "on_failure": "warn",
-          "message": "Auto-formatting with Black"
-        },
-        {
-          "type": "command",
-          "command": "ruff check --fix ${file_path}",
-          "on_failure": "warn",
-          "message": "Auto-fixing with Ruff"
-        }
-      ]
-    },
-    {
-      "name": "update-imports",
-      "description": "Sort and organize imports after Python file modification",
       "trigger": "after:write_to_file",
       "conditions": {
         "file_pattern": "\\.py$"
@@ -37,144 +12,66 @@
       "actions": [
         {
           "type": "command",
-          "command": "isort ${file_path}",
-          "on_failure": "warn",
-          "message": "Organizing imports with isort"
+          "command": "black ${file_path} && ruff check --fix ${file_path}",
+          "on_failure": "warn"
         }
       ]
     },
     {
       "name": "run-quick-tests",
-      "description": "Run tests for modified Python files",
       "trigger": "after:write_to_file",
       "conditions": {
         "file_pattern": "\\.py$",
-        "not_pattern": "test_.*\\.py$",
-        "auto_test_enabled": true
+        "not_pattern": "test_.*\\.py$"
       },
       "actions": [
         {
           "type": "command",
           "command": "pytest ${test_file_path} -v --tb=short",
           "on_failure": "warn",
-          "message": "Running tests for ${file_path}",
           "async": true
         }
       ]
     },
     {
       "name": "validate-type-hints",
-      "description": "Check type hints after Python file modification",
       "trigger": "after:write_to_file",
       "conditions": {
-        "file_pattern": "\\.py$",
-        "type_checking_enabled": true
+        "file_pattern": "\\.py$"
       },
       "actions": [
         {
           "type": "command",
           "command": "mypy ${file_path}",
-          "on_failure": "warn",
-          "message": "Type checking with mypy"
-        }
-      ]
-    },
-    {
-      "name": "update-documentation",
-      "description": "Regenerate documentation after code changes",
-      "trigger": "after:write_to_file",
-      "conditions": {
-        "file_pattern": "\\.py$",
-        "has_docstrings": true
-      },
-      "actions": [
-        {
-          "type": "log",
-          "level": "info",
-          "message": "Consider updating documentation for ${file_path}"
+          "on_failure": "warn"
         }
       ]
     },
     {
       "name": "git-add-modified",
-      "description": "Automatically stage modified files",
       "trigger": "after:write_to_file",
       "conditions": {
-        "auto_stage_enabled": true,
         "in_git_repo": true
       },
       "actions": [
         {
           "type": "command",
           "command": "git add ${file_path}",
-          "on_failure": "warn",
-          "message": "Staging ${file_path}"
+          "on_failure": "ignore"
         }
       ]
     },
     {
-      "name": "security-scan-after-install",
-      "description": "Run security scan after package installation",
+      "name": "security-scan",
       "trigger": "after:execute_command",
       "conditions": {
-        "command_pattern": "(pip install|poetry add)",
-        "exit_code": 0
+        "command_pattern": "(pip install|poetry add)"
       },
       "actions": [
         {
           "type": "command",
-          "command": "bash ${hooks_dir}/utils/validate-dependencies.sh",
+          "command": "pip-audit",
           "on_failure": "warn",
-          "message": "Running security scan on dependencies",
-          "async": true
-        }
-      ]
-    },
-    {
-      "name": "update-lock-files",
-      "description": "Update lock files after dependency changes",
-      "trigger": "after:write_to_file",
-      "conditions": {
-        "file_pattern": "(requirements\\.txt|pyproject\\.toml|Pipfile)$"
-      },
-      "actions": [
-        {
-          "type": "log",
-          "level": "info",
-          "message": "Dependency file modified. Consider updating lock files."
-        }
-      ]
-    },
-    {
-      "name": "notify-test-results",
-      "description": "Notify about test execution results",
-      "trigger": "after:execute_command",
-      "conditions": {
-        "command_pattern": "pytest",
-        "exit_code": 0
-      },
-      "actions": [
-        {
-          "type": "log",
-          "level": "success",
-          "message": "✓ Tests passed successfully"
-        }
-      ]
-    },
-    {
-      "name": "cleanup-cache",
-      "description": "Clean Python cache after significant changes",
-      "trigger": "after:write_to_file",
-      "conditions": {
-        "file_pattern": "\\.py$",
-        "cleanup_enabled": true
-      },
-      "actions": [
-        {
-          "type": "command",
-          "command": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true",
-          "on_failure": "ignore",
-          "message": "Cleaning Python cache",
           "async": true
         }
       ]
@@ -182,13 +79,7 @@
   ],
   "configuration": {
     "enabled": true,
-    "log_level": "info",
-    "log_file": "${hooks_dir}/.hook-logs/post-tool-use.log",
     "timeout_seconds": 60,
-    "parallel_execution": true,
-    "auto_test_enabled": false,
-    "auto_stage_enabled": false,
-    "type_checking_enabled": true,
-    "cleanup_enabled": false
+    "parallel_execution": true
   }
 }

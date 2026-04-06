@@ -1,12 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "name": "pre-tool-use",
-  "description": "Validation hooks executed before Claude Code uses tools",
-  "version": "1.0.0",
+  "description": "Validation hooks before Claude Code uses tools",
   "hooks": [
     {
       "name": "validate-python-syntax",
-      "description": "Validate Python syntax before file modifications",
       "trigger": "before:write_to_file",
       "conditions": {
         "file_pattern": "\\.py$"
@@ -15,14 +13,12 @@
         {
           "type": "command",
           "command": "python3 -m py_compile ${file_path}",
-          "on_failure": "warn",
-          "message": "Python syntax validation failed for ${file_path}"
+          "on_failure": "warn"
         }
       ]
     },
     {
       "name": "check-file-size",
-      "description": "Warn about large file operations",
       "trigger": "before:write_to_file",
       "conditions": {
         "file_size_gt": 1048576
@@ -30,100 +26,50 @@
       "actions": [
         {
           "type": "prompt",
-          "message": "File ${file_path} is larger than 1MB. Continue?",
+          "message": "File >1MB. Continue?",
           "on_decline": "abort"
         }
       ]
     },
     {
-      "name": "prevent-secret-exposure",
-      "description": "Scan for secrets before file write",
+      "name": "prevent-secrets",
       "trigger": "before:write_to_file",
       "conditions": {
-        "file_pattern": "\\.(py|js|ts|json|yaml|yml|env)$"
-      },
-      "actions": [
-        {
-          "type": "command",
-          "command": "bash ${hooks_dir}/utils/scan-secrets.sh --file ${file_path}",
-          "on_failure": "abort",
-          "message": "Secret detected in ${file_path}. Aborting write operation."
-        }
-      ]
-    },
-    {
-      "name": "validate-json-yaml",
-      "description": "Validate JSON/YAML syntax before write",
-      "trigger": "before:write_to_file",
-      "conditions": {
-        "file_pattern": "\\.(json|yaml|yml)$"
-      },
-      "actions": [
-        {
-          "type": "command",
-          "command": "python3 -c \"import json, yaml, sys; (json.load if '${file_path}'.endswith('.json') else yaml.safe_load)(open('${file_path}'))\"",
-          "on_failure": "warn",
-          "message": "Invalid JSON/YAML syntax in ${file_path}"
-        }
-      ]
-    },
-    {
-      "name": "check-destructive-commands",
-      "description": "Warn before executing potentially destructive commands",
-      "trigger": "before:execute_command",
-      "conditions": {
-        "command_pattern": "(rm -rf|DROP DATABASE|DELETE FROM|truncate|mkfs|dd if=)"
+        "content_pattern": "(AKIA[0-9A-Z]{16}|ghp_[0-9a-zA-Z]{36}|-----BEGIN.*PRIVATE KEY-----|api[_-]?key.*['\"]([a-zA-Z0-9]{32,})['\"]|password.*=.*['\"](.+)['\"])"
       },
       "actions": [
         {
           "type": "prompt",
-          "message": "⚠️  Potentially destructive command detected: ${command}\n\nAre you sure you want to execute this?",
+          "message": "Secret detected. Abort?",
+          "on_decline": "continue"
+        }
+      ]
+    },
+    {
+      "name": "check-destructive",
+      "trigger": "before:execute_command",
+      "conditions": {
+        "command_pattern": "(rm -rf|DROP DATABASE|DELETE FROM|--force|git reset --hard)"
+      },
+      "actions": [
+        {
+          "type": "prompt",
+          "message": "Destructive command. Continue?",
           "on_decline": "abort"
         }
       ]
     },
     {
-      "name": "validate-package-install",
-      "description": "Validate package installations",
+      "name": "prevent-production",
       "trigger": "before:execute_command",
       "conditions": {
-        "command_pattern": "(pip install|poetry add|npm install)"
-      },
-      "actions": [
-        {
-          "type": "log",
-          "level": "info",
-          "message": "Installing packages: ${command}"
-        }
-      ]
-    },
-    {
-      "name": "check-git-operations",
-      "description": "Validate git operations",
-      "trigger": "before:execute_command",
-      "conditions": {
-        "command_pattern": "git (push|force|reset --hard)"
+        "command_pattern": "(deploy|kubectl apply|terraform apply)",
+        "file_pattern": "\\.(prod|production)\\..*$"
       },
       "actions": [
         {
           "type": "prompt",
-          "message": "Git operation detected: ${command}\n\nThis may affect remote repository. Continue?",
-          "on_decline": "abort"
-        }
-      ]
-    },
-    {
-      "name": "prevent-production-changes",
-      "description": "Prevent accidental production environment changes",
-      "trigger": "before:execute_command",
-      "conditions": {
-        "environment": "production",
-        "command_pattern": "(deploy|kubectl apply|terraform apply)"
-      },
-      "actions": [
-        {
-          "type": "prompt",
-          "message": "🚨 PRODUCTION ENVIRONMENT DETECTED 🚨\n\nCommand: ${command}\n\nThis will affect production. Are you absolutely sure?",
+          "message": "Production operation. Confirm?",
           "on_decline": "abort",
           "require_confirmation": true
         }
@@ -132,9 +78,6 @@
   ],
   "configuration": {
     "enabled": true,
-    "log_level": "info",
-    "log_file": "${hooks_dir}/.hook-logs/pre-tool-use.log",
-    "timeout_seconds": 30,
-    "parallel_execution": false
+    "timeout_seconds": 30
   }
 }

@@ -1,55 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "name": "session-hooks",
-  "description": "Hooks executed at Claude Code session start and end",
-  "version": "1.0.0",
+  "description": "Hooks executed at session start and end",
   "hooks": {
     "session_start": [
       {
         "name": "check-environment",
-        "description": "Verify development environment setup",
         "actions": [
           {
             "type": "command",
-            "command": "python3 --version",
-            "on_failure": "warn",
-            "message": "Checking Python version"
-          },
-          {
-            "type": "command",
-            "command": "git --version",
-            "on_failure": "warn",
-            "message": "Checking Git installation"
+            "command": "python3 --version && git --version",
+            "on_failure": "warn"
           }
         ]
       },
       {
-        "name": "check-dependencies",
-        "description": "Verify required tools are installed",
-        "actions": [
-          {
-            "type": "command",
-            "command": "command -v black >/dev/null 2>&1 || echo 'Black not installed'",
-            "on_failure": "warn",
-            "message": "Checking Black formatter"
-          },
-          {
-            "type": "command",
-            "command": "command -v ruff >/dev/null 2>&1 || echo 'Ruff not installed'",
-            "on_failure": "warn",
-            "message": "Checking Ruff linter"
-          },
-          {
-            "type": "command",
-            "command": "command -v pytest >/dev/null 2>&1 || echo 'pytest not installed'",
-            "on_failure": "warn",
-            "message": "Checking pytest"
-          }
-        ]
-      },
-      {
-        "name": "git-status-check",
-        "description": "Check git repository status",
+        "name": "git-status",
         "conditions": {
           "in_git_repo": true
         },
@@ -57,121 +23,37 @@
           {
             "type": "command",
             "command": "git status --short",
-            "on_failure": "ignore",
-            "message": "Checking git status"
-          },
-          {
-            "type": "command",
-            "command": "git fetch --dry-run 2>&1 | grep -q 'up to date' || echo 'Remote changes available'",
-            "on_failure": "ignore",
-            "message": "Checking for remote updates"
-          }
-        ]
-      },
-      {
-        "name": "load-environment",
-        "description": "Load environment variables and configuration",
-        "actions": [
-          {
-            "type": "log",
-            "level": "info",
-            "message": "Loading project configuration..."
-          },
-          {
-            "type": "command",
-            "command": "test -f .env && echo '.env file found' || echo 'No .env file'",
-            "on_failure": "ignore",
-            "message": "Checking for .env file"
-          }
-        ]
-      },
-      {
-        "name": "security-check",
-        "description": "Run initial security checks",
-        "actions": [
-          {
-            "type": "command",
-            "command": "bash ${hooks_dir}/utils/scan-secrets.sh --quick",
-            "on_failure": "warn",
-            "message": "Running quick security scan",
-            "async": true
-          }
-        ]
-      },
-      {
-        "name": "welcome-message",
-        "description": "Display welcome message and tips",
-        "actions": [
-          {
-            "type": "log",
-            "level": "info",
-            "message": "🚀 Claude Code session started\n\n📋 Available hooks:\n  - Pre-commit: Format & lint checks\n  - Pre-push: Full test suite\n  - Post-checkout: Dependency sync\n  - Post-merge: Auto-install & migrate\n\n💡 Tips:\n  - Use SKIP_HOOKS=true to bypass hooks\n  - Check .hook-logs/ for detailed logs\n  - Run 'bash hooks/utils/format-code.sh' to format all files\n"
+            "on_failure": "ignore"
           }
         ]
       }
     ],
     "session_end": [
       {
-        "name": "cleanup-temp-files",
-        "description": "Clean up temporary files",
+        "name": "cleanup-temp",
         "actions": [
+          {
+            "type": "command",
+            "command": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true",
+            "on_failure": "ignore"
+          },
           {
             "type": "command",
             "command": "find ${hooks_dir}/.hook-logs -name '*.log' -mtime +7 -delete 2>/dev/null || true",
-            "on_failure": "ignore",
-            "message": "Cleaning old log files"
-          }
-        ]
-      },
-      {
-        "name": "save-session-state",
-        "description": "Save session state and statistics",
-        "actions": [
-          {
-            "type": "log",
-            "level": "info",
-            "message": "Saving session state..."
-          }
-        ]
-      },
-      {
-        "name": "git-status-summary",
-        "description": "Show final git status",
-        "conditions": {
-          "in_git_repo": true
-        },
-        "actions": [
-          {
-            "type": "command",
-            "command": "git status --short",
-            "on_failure": "ignore",
-            "message": "Final git status"
-          }
-        ]
-      },
-      {
-        "name": "uncommitted-changes-warning",
-        "description": "Warn about uncommitted changes",
-        "conditions": {
-          "in_git_repo": true
-        },
-        "actions": [
-          {
-            "type": "command",
-            "command": "git diff-index --quiet HEAD -- || echo '⚠️  You have uncommitted changes'",
-            "on_failure": "ignore",
-            "message": "Checking for uncommitted changes"
+            "on_failure": "ignore"
           }
         ]
       },
       {
         "name": "session-summary",
-        "description": "Display session summary",
+        "conditions": {
+          "in_git_repo": true
+        },
         "actions": [
           {
-            "type": "log",
-            "level": "info",
-            "message": "👋 Claude Code session ended\n\n📊 Session Summary:\n  - Check .hook-logs/ for execution logs\n  - Review any warnings or errors above\n  - Don't forget to commit your changes!\n\n✨ Happy coding!\n"
+            "type": "command",
+            "command": "echo \"Files changed: $(git diff --name-only | wc -l | tr -d ' ')\"",
+            "on_failure": "ignore"
           }
         ]
       }
@@ -179,11 +61,6 @@
   },
   "configuration": {
     "enabled": true,
-    "log_level": "info",
-    "log_file": "${hooks_dir}/.hook-logs/session-hooks.log",
-    "timeout_seconds": 30,
-    "parallel_execution": false,
-    "show_welcome_message": true,
-    "show_summary": true
+    "timeout_seconds": 30
   }
 }
