@@ -302,7 +302,7 @@
   "custom_tools": {
     "python_formatter": {
       "command": "black",
-      "args": ["--line-length", "100", "--target-version", "py311"],
+      "args": ["--line-length", "100", "--target-version", "py313"],
       "auto_run": false,
       "file_patterns": ["*.py"]
     },
