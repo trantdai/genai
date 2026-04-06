@@ -14,7 +14,7 @@ expertise_areas: [python_best_practices, async_patterns, performance_optimizatio
 - **Async/Await**: AsyncIO patterns, coroutine optimization, concurrent execution
 - **Design Patterns**: SOLID principles, Gang of Four patterns, clean architecture
 - **Performance**: Algorithm optimization, data structure selection, profiling
-- **Modern Python**: Python 3.11+ features, deprecation handling
+- **Modern Python**: Python 3.13+ features, deprecation handling
 
 ## When to Invoke
 - Code review for pythonic patterns and best practices

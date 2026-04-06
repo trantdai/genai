@@ -1,5 +1,6 @@
 {
   "version": "1.0",
+  "_comment": "Generic Python project settings for Claude Code. Customize per project in settings.local.json",
   "permissions": {
     "file_operations": {
       "read": true,
@@ -45,6 +46,8 @@
       "mypy",
       "bandit",
       "safety",
+      "pip-audit",
+      "detect-secrets",
       "pre-commit",
       "git",
       "docker",
@@ -79,7 +82,6 @@
       "format",
       "fdisk",
       "mkfs",
-      "fsck",
       "mount",
       "umount",
       "sudo",
@@ -229,193 +231,6 @@
       "COVERAGE_*"
     ]
   },
-  "hooks": {
-    "pre_command": {
-      "script": ".claude/hooks/pre-command.py",
-      "enabled": true,
-      "timeout_seconds": 30
-    },
-    "post_command": {
-      "script": ".claude/hooks/post-command.py",
-      "enabled": true,
-      "timeout_seconds": 30
-    },
-    "file_change": {
-      "script": ".claude/hooks/file-change.py",
-      "enabled": true,
-      "timeout_seconds": 60
-    },
-    "security_scan": {
-      "script": ".claude/hooks/security-scan.py",
-      "enabled": true,
-      "timeout_seconds": 120
-    }
-  },
-  "mcp_servers": {
-    "filesystem": {
-      "enabled": true,
-      "config": {
-        "root_path": ".",
-        "allowed_extensions": [".py", ".md", ".txt", ".yaml", ".yml", ".json", ".toml"]
-      }
-    },
-    "git": {
-      "enabled": true,
-      "config": {
-        "allow_push": false,
-        "allow_commit": true,
-        "allow_branch_operations": true
-      }
-    },
-    "python_analyzer": {
-      "enabled": true,
-      "config": {
-        "ast_analysis": true,
-        "dependency_tracking": true,
-        "type_checking": true
-      }
-    },
-    "testing": {
-      "enabled": true,
-      "config": {
-        "test_runner": "pytest",
-        "coverage_enabled": true,
-        "parallel_execution": true
-      }
-    },
-    "security_scanner": {
-      "enabled": true,
-      "config": {
-        "tools": ["bandit", "safety", "semgrep"],
-        "auto_fix": false,
-        "report_level": "medium"
-      }
-    },
-    "documentation": {
-      "enabled": true,
-      "config": {
-        "auto_generate": false,
-        "formats": ["markdown", "sphinx"]
-      }
-    }
-  },
-  "custom_tools": {
-    "python_formatter": {
-      "command": "black",
-      "args": ["--line-length", "100", "--target-version", "py313"],
-      "auto_run": false,
-      "file_patterns": ["*.py"]
-    },
-    "python_linter": {
-      "command": "ruff",
-      "args": ["check", "--fix", "--exit-zero"],
-      "auto_run": false,
-      "file_patterns": ["*.py"]
-    },
-    "type_checker": {
-      "command": "mypy",
-      "args": ["--strict", "--show-error-codes"],
-      "auto_run": false,
-      "file_patterns": ["*.py"]
-    },
-    "security_scanner": {
-      "command": "bandit",
-      "args": ["-r", "-f", "json"],
-      "auto_run": false,
-      "file_patterns": ["*.py"]
-    },
-    "dependency_checker": {
-      "command": "safety",
-      "args": ["check", "--json"],
-      "auto_run": false,
-      "file_patterns": ["requirements*.txt", "pyproject.toml"]
-    },
-    "test_runner": {
-      "command": "pytest",
-      "args": ["-v", "--tb=short", "--cov", "--cov-report=html"],
-      "auto_run": false,
-      "file_patterns": ["test_*.py", "*_test.py"]
-    },
-    "coverage_reporter": {
-      "command": "coverage",
-      "args": ["report", "--show-missing"],
-      "auto_run": false,
-      "file_patterns": [".coverage"]
-    },
-    "dependency_installer": {
-      "command": "pip",
-      "args": ["install", "-r"],
-      "auto_run": false,
-      "file_patterns": ["requirements*.txt"]
-    }
-  },
-  "code_analysis": {
-    "enabled": true,
-    "tools": {
-      "ast_parser": true,
-      "complexity_analyzer": true,
-      "dependency_tracker": true,
-      "import_analyzer": true,
-      "function_analyzer": true,
-      "class_analyzer": true
-    },
-    "thresholds": {
-      "max_complexity": 15,
-      "max_function_length": 50,
-      "max_class_methods": 20,
-      "max_file_length": 1000
-    }
-  },
-  "auto_formatting": {
-    "enabled": false,
-    "on_save": false,
-    "tools": ["black", "ruff"],
-    "ignore_patterns": [
-      "migrations/*",
-      "generated/*",
-      "vendor/*"
-    ]
-  },
-  "testing": {
-    "framework": "pytest",
-    "auto_discovery": true,
-    "coverage_threshold": 80,
-    "parallel_execution": true,
-    "test_patterns": [
-      "test_*.py",
-      "*_test.py",
-      "tests/*.py"
-    ],
-    "ignore_patterns": [
-      "migrations/*",
-      "vendor/*",
-      ".venv/*"
-    ]
-  },
-  "security": {
-    "scan_on_change": true,
-    "tools": ["bandit", "safety", "semgrep"],
-    "ignore_files": [
-      ".bandit",
-      ".semgrepignore"
-    ],
-    "secret_detection": {
-      "enabled": true,
-      "patterns": [
-        "(?i)(api_?key|password|secret|token)\\s*[:=]\\s*['\"]?[a-zA-Z0-9_-]{20,}",
-        "(?i)(aws_access_key_id|aws_secret_access_key)",
-        "(?i)(github_token|gh_token)",
-        "(?i)(database_url|db_url)"
-      ]
-    }
-  },
-  "documentation": {
-    "auto_generate": false,
-    "style": "google",
-    "include_type_hints": true,
-    "include_examples": true,
-    "formats": ["markdown", "html"]
-  },
   "project_structure": {
     "src_layout": true,
     "test_directory": "tests",
@@ -426,40 +241,11 @@
       "requirements.txt"
     ]
   },
-  "integrations": {
-    "git": {
-      "pre_commit_hooks": true,
-      "commit_message_format": "conventional",
-      "auto_stage_formatted": false
-    },
-    "docker": {
-      "enabled": true,
-      "auto_build": false,
-      "security_scan": true
-    },
-    "ci_cd": {
-      "github_actions": true,
-      "auto_test": true,
-      "auto_deploy": false
-    }
-  },
-  "performance": {
-    "cache_enabled": true,
-    "parallel_operations": true,
-    "max_concurrent_tasks": 4,
-    "memory_limit_mb": 1024
-  },
   "logging": {
     "level": "INFO",
     "file": ".claude/logs/claude.log",
     "max_size_mb": 10,
     "backup_count": 5,
     "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  },
-  "ui_preferences": {
-    "show_progress": true,
-    "confirm_destructive": true,
-    "color_output": true,
-    "verbose_mode": false
   }
 }

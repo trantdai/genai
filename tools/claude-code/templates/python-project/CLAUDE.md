@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Modern Python project using src-layout pattern with strict standards for maintainability, security, and performance.
+Modern Python project template with optimized Claude Code configuration. Emphasizes type safety, testing, security, and async patterns.
 
 **Stack**: Python 3.13+, Black/Ruff, mypy, pytest, Pydantic v2+, asyncio
 
@@ -16,157 +16,92 @@ project/
 │   ├── repositories/     # Data access
 │   └── utils/           # Utilities
 ├── tests/                # Test suite (mirrors src)
-├── .claude/              # Project configuration
+├── .claude/              # Claude Code configuration (~1,700 lines)
+│   ├── settings.json    # Core permissions & restrictions
+│   ├── rules/           # Development standards (5 files)
+│   ├── skills/          # Workflow checklists (4 files)
+│   ├── agents/          # Specialized AI agents (5 agents)
+│   └── hooks/           # Git & Claude hooks
 ├── pyproject.toml        # Dependencies & tool config
 └── requirements.txt      # Pinned dependencies
 ```
 
 ## Development Standards
 
-### Code Quality
-- **Type Hints**: Required for all functions and classes
-- **Docstrings**: Google style for public APIs
-- **Formatting**: Black (100-char lines), Ruff (linting/imports)
-- **Type Checking**: mypy strict mode
-- **Line Length**: 100 characters maximum
-- **Testing**: pytest with 80%+ coverage minimum
+All standards are defined in [`.claude/rules/`](.claude/rules/):
 
-See: [`.claude/rules/python-code-style.md`](.claude/rules/python-code-style.md)
-
-### Testing Requirements
-- **Framework**: pytest exclusively (never unittest)
-- **Mocking**: pytest-mock plugin (never unittest.mock)
-- **Coverage**: 80% minimum, 90%+ for critical paths
-- **Async Tests**: pytest-asyncio with `@pytest.mark.asyncio`
-- **Organization**: unit/, integration/, e2e/ structure
-
-See: [`.claude/rules/python-testing.md`](.claude/rules/python-testing.md)
-
-### Security Standards
-- **Input Validation**: Pydantic models at all boundaries
-- **Password Hashing**: bcrypt with 12+ rounds
-- **Authentication**: JWT tokens with short expiry
-- **HTTPS Only**: All production communications
-- **Secrets**: Environment variables (never hardcoded)
-- **SQL**: Parameterized queries only
-
-See: [`.claude/rules/python-security.md`](.claude/rules/python-security.md)
-
-### Async Patterns
-- **I/O Operations**: Use async/await for database, HTTP, files
-- **Concurrency**: asyncio.gather(), semaphores for rate limiting
-- **Database**: AsyncPG (PostgreSQL) or SQLAlchemy async
-- **HTTP**: httpx or aiohttp for async requests
-- **Never Block**: Use async alternatives (asyncio.sleep, not time.sleep)
-
-See: [`.claude/rules/python-async.md`](.claude/rules/python-async.md)
-
-### Performance
-- **Data Structures**: Choose optimal collections (set vs list)
-- **Algorithms**: O(n log n) max for large datasets
-- **Memory**: Use generators for large data, __slots__ for classes
-- **Profiling**: Profile before optimizing
-- **Caching**: LRU cache for expensive computations
-
-See: [`.claude/rules/python-performance.md`](.claude/rules/python-performance.md)
+- **Code Style**: [python-code-style.md](.claude/rules/python-code-style.md) - PEP 8, type hints, 100-char lines
+- **Testing**: [python-testing.md](.claude/rules/python-testing.md) - pytest, 80%+ coverage, fixtures
+- **Security**: [python-security.md](.claude/rules/python-security.md) - Input validation, bcrypt, secrets management
+- **Async**: [python-async.md](.claude/rules/python-async.md) - asyncio, asyncpg, httpx patterns
+- **Performance**: [python-performance.md](.claude/rules/python-performance.md) - Data structures, profiling, caching
 
 ## Workflows
 
-### Development Workflow
-1. Activate virtual environment: `source .venv/bin/activate`
-2. Run tests frequently: `pytest -x` (fail fast)
-3. Format before commit: `black src tests`
-4. Type check: `mypy src`
+Workflow checklists in [`.claude/skills/`](.claude/skills/):
 
-### Before Committing
-```bash
-black src tests --check && ruff check src tests && mypy src && pytest --cov=src --cov-fail-under=80
-```
+- **TDD**: [tdd-workflow.md](.claude/skills/tdd-workflow.md) - Red-Green-Refactor cycle
+- **Code Review**: [code-review-workflow.md](.claude/skills/code-review-workflow.md) - Review checklist
+- **Refactoring**: [refactoring-workflow.md](.claude/skills/refactoring-workflow.md) - Safe refactoring steps
+- **Security Audit**: [security-audit.md](.claude/skills/security-audit.md) - Security scan workflow
+- **Performance Analysis**: [performance-analysis.md](.claude/skills/performance-analysis.md) - Profiling workflow
 
-### TDD Workflow
-1. **Red**: Write failing test
-2. **Green**: Minimal code to pass
-3. **Refactor**: Improve while keeping tests green
-
-See: [`.claude/workflows/tdd-workflow.md`](.claude/workflows/tdd-workflow.md)
-
-### Code Review
-- Security implications reviewed
-- Test coverage maintained
-- Performance impact assessed
-- Breaking changes documented
-
-See: [`.claude/workflows/code-review-workflow.md`](.claude/workflows/code-review-workflow.md)
-
-### Safe Refactoring
-- Write characterization tests first
-- Refactor incrementally
-- Run tests after each change
-- Use IDE refactoring tools
-
-See: [`.claude/workflows/safe-refactoring-workflow.md`](.claude/workflows/safe-refactoring-workflow.md)
-
-## Common Commands
+## Development Commands
 
 ```bash
 # Setup
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 
-# Development
-black src tests                    # Format code
-ruff check src tests --fix         # Lint and fix
+# Quality Checks
+black src tests                    # Format
+ruff check src tests --fix         # Lint
 mypy src                           # Type check
-
-# Testing
-pytest                             # Run all tests
-pytest --cov=src --cov-report=html # With coverage
-pytest -k "test_user" -v           # Run specific tests
+pytest --cov=src --cov-fail-under=80  # Test
 
 # Security
-pip-audit                          # Vulnerability scan
+pip-audit                          # CVE scan
 bandit -r src/                     # Security linter
+detect-secrets scan                # Secret detection
 ```
 
-## Agents
+## Specialized Agents
 
-**When to use specialized agents:**
+Available in [`.claude/agents/`](.claude/agents/):
 
-- **python-specialist**: Code review, performance optimization, design patterns
-- **testing-expert**: Test strategy, coverage improvement, test debugging
-- **security-auditor**: Security review, vulnerability assessment, compliance
+- **python-specialist**: Code review, async patterns, design patterns
+- **testing-expert**: Test strategy, coverage improvement (80%+ target)
+- **security-auditor**: Vulnerability detection, OWASP compliance
+- **code-reviewer**: Architecture review, SOLID principles
+- **performance-optimizer**: Profiling, database optimization, memory leaks
 
-See: [`.claude/agents/`](.claude/agents/)
+## Configuration
 
-## Dependencies
+**Settings**: [`.claude/settings.json`](.claude/settings.json)
+- Permissions (file operations, commands, network)
+- Command restrictions (allow/block lists)
+- File patterns (editable/readonly/forbidden)
+- Environment variables (allowed/blocked)
 
-- Use `>=` for version constraints (e.g., `pydantic>=2.5.0`)
-- Pin versions in requirements.txt for reproducibility
-- Update dependencies monthly, security patches immediately
-- Audit new dependencies before adding
-- Keep production dependencies minimal
+**Local Overrides**: Copy `.claude/settings.local.json.example` to `settings.local.json`
 
 ## Key Principles
 
-- **Simplicity**: Minimal code to achieve requirements
-- **Type Safety**: Comprehensive type hints, mypy strict mode
-- **Test First**: TDD approach for new features
-- **Async I/O**: Use async patterns for all I/O operations
-- **Security**: Validate inputs, encode outputs, never trust user data
-- **Performance**: Profile before optimizing, use appropriate algorithms
+- **Type Safety**: Type hints everywhere, mypy strict mode
+- **Test First**: TDD approach, 80%+ coverage minimum
+- **Async I/O**: Use async for all I/O operations
+- **Security**: Validate inputs, Pydantic at boundaries, no hardcoded secrets
+- **Performance**: Profile before optimizing, use appropriate data structures
 
-## Checklist
+## Task Checklist
 
-Before completing any task:
-
-- [ ] Type hints on all functions/methods
-- [ ] Tests written and passing (80%+ coverage)
-- [ ] Security reviewed (no hardcoded secrets, input validation)
-- [ ] Error handling with specific exceptions
+- [ ] Type hints on all functions
+- [ ] Tests passing (80%+ coverage)
+- [ ] Security reviewed (input validation, no secrets)
 - [ ] Code formatted (Black, Ruff)
 - [ ] Type checking passes (mypy)
-- [ ] Documentation updated if public API changed
+- [ ] Error handling with specific exceptions
 
 ---
 
-*For detailed guidelines, see `.claude/rules/` and `.claude/workflows/`*
+*Configuration optimized to ~1,700 lines (28% reduction from baseline). See `.claude/rules/` for detailed standards.*

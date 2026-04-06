@@ -7,12 +7,12 @@
     },
     "network_access": {
       "allow_external": true,
-      "allowed_domains": ["your-private-registry.com"]
+      "allowed_domains": ["your-private-registry.com", "internal.company.com"]
     }
   },
 
   "command_restrictions": {
-    "allowed_commands": ["jupyter", "ipython", "conda"]
+    "allowed_commands": ["jupyter", "ipython", "conda", "npm"]
   },
 
   "file_restrictions": {
@@ -21,37 +21,12 @@
   },
 
   "environment_variables": {
-    "allowed_read": ["DEBUG", "LOG_LEVEL", "YOUR_PROJECT_*"]
+    "allowed_read": ["DEBUG", "LOG_LEVEL", "YOUR_PROJECT_*", "CUSTOM_*"]
   },
 
-  "custom_tools": {
-    "custom_formatter": {
-      "command": "ruff",
-      "args": ["format", "--line-length", "120"],
-      "file_patterns": ["*.py"]
-    }
-  },
-
-  "code_analysis": {
-    "thresholds": {
-      "max_complexity": 20,
-      "max_function_length": 75
-    }
-  },
-
-  "auto_formatting": {
-    "enabled": true,
-    "on_save": true
-  },
-
-  "testing": {
-    "coverage_threshold": 70,
-    "pytest_args": ["-v", "--tb=short"]
-  },
-
-  "performance": {
-    "max_concurrent_tasks": 8,
-    "memory_limit_mb": 2048
+  "project_structure": {
+    "test_directory": "test",
+    "docs_directory": "documentation"
   },
 
   "logging": {

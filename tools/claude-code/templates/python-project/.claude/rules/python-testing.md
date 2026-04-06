@@ -1,26 +1,11 @@
 # Python Testing Rules
 
-## Overview
-Comprehensive testing standards for Python projects ensuring reliability and maintainability.
+## Framework
+- **Mandatory**: pytest exclusively (never unittest)
+- **Dependencies**: pytest ≥7.4.0, pytest-mock ≥3.11.0, pytest-asyncio ≥0.21.0, pytest-cov ≥4.1.0
 
-## Testing Framework Requirements
+## Organization
 
-### Pytest Exclusively
-- **Mandatory**: Use pytest for all testing (never unittest module)
-- **Configuration**: Configure in `pyproject.toml` (see [pytest docs](https://docs.pytest.org/))
-
-### Required Dependencies
-```toml
-[tool.poetry.group.test.dependencies]
-pytest = ">=7.4.0"
-pytest-mock = ">=3.11.0"  # Use instead of unittest.mock
-pytest-asyncio = ">=0.21.0"
-pytest-cov = ">=4.1.0"
-```
-
-## Test Organization
-
-### Directory Structure
 ```
 tests/
 ├── conftest.py          # Shared fixtures
@@ -29,249 +14,131 @@ tests/
 └── e2e/                # End-to-end tests
 ```
 
-### Naming Conventions
-✅ **DO**: Follow pytest conventions
+**Naming:**
 - Files: `test_*.py` or `*_test.py`
 - Functions: `test_<descriptive_name>()`
 - Classes: `Test<ClassName>`
 
-❌ **DON'T**: Use non-standard naming
-- `user_tests.py` (wrong suffix)
-- `def testUser()` (wrong case)
-
 ## Coverage Requirements
-
-### Minimum Thresholds
 - **Overall**: 80% minimum (enforced by CI)
 - **New Code**: 90% minimum
 - **Critical Paths**: 95% minimum (auth, payment, data integrity)
 
-### Coverage Configuration
-```toml
-[tool.coverage.run]
-source = ["src"]
-omit = ["*/tests/*", "*/venv/*", "*/.venv/*"]
+## Best Practices
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-]
-```
-
-## Testing Best Practices
-
-### Test Structure (AAA Pattern)
+**Test Structure (AAA Pattern):**
 ```python
-def test_user_creation_with_valid_email():
-    """Test that user creation succeeds with valid email."""
+def test_user_creation():
     # Arrange
     email = "test@example.com"
-    name = "Test User"
     
     # Act
-    user = create_user(name, email)
+    user = create_user("Test User", email)
     
     # Assert
     assert user.email == email
-    assert user.name == name
 ```
 
-### Descriptive Test Names
-✅ **DO**: Clear, descriptive names
-```python
-def test_user_service_returns_none_when_user_not_found():
-    """Test that UserService returns None for non-existent user."""
-    pass
+**Descriptive Names:**
+- ✅ `test_user_service_returns_none_when_user_not_found()`
+- ❌ `test_user()`, `test_1()`
 
-def test_calculate_discount_raises_error_for_negative_price():
-    """Test that negative prices raise ValueError."""
-    pass
+**Parametrized Tests:**
+```python
+@pytest.mark.parametrize("user_data,expected", [
+    ({"email": "valid@test.com"}, True),
+    ({"email": "invalid"}, False),
+])
+def test_validation(user_data, expected):
+    assert validate_user(user_data) == expected
 ```
 
-❌ **DON'T**: Vague names
-```python
-def test_user():          # Too vague
-def test_1():            # Non-descriptive
-```
+## Fixtures
 
-## Fixture Usage
-
-### Shared Fixtures (conftest.py)
 ```python
-# tests/conftest.py
-import pytest
+@pytest.fixture
+def sample_user():
+    return {"id": "123", "email": "test@example.com"}
 
 @pytest.fixture
-def sample_user_data():
-    """Sample user data for testing."""
-    return {
-        "id": "user_123",
-        "email": "test@example.com",
-        "name": "Test User"
-    }
-
-@pytest.fixture
-def mock_database_session(mocker):
-    """Mock database session."""
+def mock_db(mocker):
     session = mocker.Mock()
     session.commit = mocker.Mock()
-    session.rollback = mocker.Mock()
     return session
 ```
 
-### Fixture Scopes
-- `function` (default): Per test function
-- `module`: Per test module
-- `session`: Per test session
+**Fixture Scopes:** `function` (default), `module`, `session`
 
-### Parameterized Fixtures
+## Mocking
+
+✅ **DO**: Use pytest-mock
 ```python
-@pytest.mark.parametrize("user_data,expected_valid", [
-    ({"email": "valid@test.com", "name": "Valid"}, True),
-    ({"email": "invalid", "name": "Invalid"}, False),
-])
-def test_user_validation(user_data, expected_valid):
-    """Test user validation with multiple scenarios."""
-    assert validate_user(user_data) == expected_valid
-```
-
-## Mocking with pytest-mock
-
-✅ **DO**: Use pytest-mock mocker fixture
-```python
-def test_user_service_calls_database(mocker, sample_user_data):
-    """Test that UserService properly calls database methods."""
-    mock_db = mocker.patch('src.services.user_service.database')
-    mock_db.get_user.return_value = sample_user_data
+def test_service(mocker, sample_user):
+    mock_db = mocker.patch('src.services.database')
+    mock_db.get_user.return_value = sample_user
     
     service = UserService()
-    result = service.get_user("user_123")
+    result = service.get_user("123")
     
-    mock_db.get_user.assert_called_once_with("user_123")
-    assert result == sample_user_data
+    mock_db.get_user.assert_called_once_with("123")
 ```
 
 ❌ **DON'T**: Use unittest.mock directly
-```python
-import unittest.mock  # Avoid this
-
-def test_user_service():
-    with unittest.mock.patch('src.services.database') as mock_db:  # Don't do this
-        pass
-```
 
 ## Async Testing
 
-### Configuration
-```toml
-[tool.pytest.ini_options]
-asyncio_mode = "auto"  # Automatically detect async tests
-```
-
-### Async Test Example
 ```python
-import pytest
-
 @pytest.mark.asyncio
-async def test_async_user_creation(async_database):
-    """Test async user creation."""
-    service = AsyncUserService(async_database)
-    user = await service.create_user({"name": "Test", "email": "test@example.com"})
-    
+async def test_async_creation(async_db):
+    service = AsyncUserService(async_db)
+    user = await service.create_user({"email": "test@example.com"})
     assert user.id is not None
-    assert user.email == "test@example.com"
 ```
+
+Configure: `asyncio_mode = "auto"` in pyproject.toml
 
 ## Exception Testing
 
-✅ **DO**: Test expected exceptions
 ```python
-def test_user_service_raises_not_found():
-    """Test that UserService raises NotFound for invalid ID."""
-    service = UserService()
-    
+def test_raises_error():
     with pytest.raises(UserNotFoundError) as exc_info:
-        service.get_user("nonexistent_id")
-    
-    assert "nonexistent_id" in str(exc_info.value)
+        service.get_user("nonexistent")
+    assert "nonexistent" in str(exc_info.value)
 ```
 
-## Integration Testing
+## Execution
 
-### Database Integration
-- Use real database (not mocks) for integration tests
-- Clean database state between tests
-- Test full CRUD operations
-
-### API Integration
-- Test actual HTTP endpoints
-- Verify request/response formats
-- Test error handling
-
-## Test Execution
-
-### Common Commands
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=src --cov-report=html
-
-# Run specific test types
-pytest -m unit                    # Unit tests only
-pytest -m integration            # Integration tests only
-pytest -m "not slow"             # Skip slow tests
-
-# Run in parallel
-pytest -n auto                   # Requires pytest-xdist
-
-# Run with verbose output
-pytest -v --tb=short
+pytest                                    # All tests
+pytest --cov=src --cov-report=html       # With coverage
+pytest -m unit                            # Unit tests only
+pytest -n auto                            # Parallel (requires pytest-xdist)
 ```
 
-### CI/CD Integration
-See [GitHub Actions documentation](https://docs.github.com/en/actions) for CI/CD setup examples.
+## Key Principles
 
-## Key Testing Principles
-
-### DO
-- Write tests before or with code (TDD)
+**DO:**
+- Write tests before/with code (TDD)
 - Test one behavior per test
-- Use descriptive test names
-- Use AAA pattern (Arrange-Act-Assert)
+- Use descriptive names
+- Use AAA pattern
 - Mock external dependencies
-- Test edge cases and error conditions
-- Maintain test independence
-- Keep tests simple and readable
+- Test edge cases and errors
+- Keep tests independent
 
-### DON'T
+**DON'T:**
 - Test implementation details
-- Have tests depend on each other
-- Use sleep() in tests (use proper async/mocking)
+- Have dependent tests
+- Use sleep() (use proper async/mocking)
 - Ignore failing tests
-- Skip writing tests for "simple" code
-- Use production data in tests
-- Hard-code test data that changes
+- Skip tests for "simple" code
+- Use production data
 
-## Success Criteria
-
-Before merging code:
+## Success Checklist
 - [ ] All tests pass
 - [ ] Coverage ≥ 80%
-- [ ] Tests follow naming conventions
+- [ ] Follows naming conventions
 - [ ] Edge cases tested
 - [ ] Error handling tested
-- [ ] Async operations tested properly
-- [ ] Integration tests for external dependencies
+- [ ] Async tests properly marked
 - [ ] No flaky tests
-
-## References
-- [Pytest Documentation](https://docs.pytest.org/)
-- [pytest-mock Plugin](https://pytest-mock.readthedocs.io/)
-- [pytest-asyncio Plugin](https://pytest-asyncio.readthedocs.io/)
-- [Coverage.py Documentation](https://coverage.readthedocs.io/)
