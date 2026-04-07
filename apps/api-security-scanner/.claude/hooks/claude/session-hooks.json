@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "session-hooks",
+  "description": "Hooks executed at session start and end",
+  "hooks": {
+    "session_start": [
+      {
+        "name": "check-environment",
+        "actions": [
+          {
+            "type": "command",
+            "command": "python3 --version && git --version",
+            "on_failure": "warn"
+          }
+        ]
+      },
+      {
+        "name": "git-status",
+        "conditions": {
+          "in_git_repo": true
+        },
+        "actions": [
+          {
+            "type": "command",
+            "command": "git status --short",
+            "on_failure": "ignore"
+          }
+        ]
+      }
+    ],
+    "session_end": [
+      {
+        "name": "cleanup-temp",
+        "actions": [
+          {
+            "type": "command",
+            "command": "find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true",
+            "on_failure": "ignore"
+          },
+          {
+            "type": "command",
+            "command": "find ${hooks_dir}/.hook-logs -name '*.log' -mtime +7 -delete 2>/dev/null || true",
+            "on_failure": "ignore"
+          }
+        ]
+      },
+      {
+        "name": "session-summary",
+        "conditions": {
+          "in_git_repo": true
+        },
+        "actions": [
+          {
+            "type": "command",
+            "command": "echo \"Files changed: $(git diff --name-only | wc -l | tr -d ' ')\"",
+            "on_failure": "ignore"
+          }
+        ]
+      }
+    ]
+  },
+  "configuration": {
+    "enabled": true,
+    "timeout_seconds": 30
+  }
+}

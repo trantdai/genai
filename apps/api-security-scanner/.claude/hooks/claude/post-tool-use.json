@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "name": "post-tool-use",
+  "description": "Automation hooks after Claude Code uses tools",
+  "hooks": [
+    {
+      "name": "auto-format-python",
+      "trigger": "after:write_to_file",
+      "conditions": {
+        "file_pattern": "\\.py$"
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "black ${file_path} && ruff check --fix ${file_path}",
+          "on_failure": "warn"
+        }
+      ]
+    },
+    {
+      "name": "run-quick-tests",
+      "trigger": "after:write_to_file",
+      "conditions": {
+        "file_pattern": "\\.py$",
+        "not_pattern": "test_.*\\.py$"
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "pytest ${test_file_path} -v --tb=short",
+          "on_failure": "warn",
+          "async": true
+        }
+      ]
+    },
+    {
+      "name": "validate-type-hints",
+      "trigger": "after:write_to_file",
+      "conditions": {
+        "file_pattern": "\\.py$"
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "mypy ${file_path}",
+          "on_failure": "warn"
+        }
+      ]
+    },
+    {
+      "name": "git-add-modified",
+      "trigger": "after:write_to_file",
+      "conditions": {
+        "in_git_repo": true
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "git add ${file_path}",
+          "on_failure": "ignore"
+        }
+      ]
+    },
+    {
+      "name": "security-scan",
+      "trigger": "after:execute_command",
+      "conditions": {
+        "command_pattern": "(pip install|poetry add)"
+      },
+      "actions": [
+        {
+          "type": "command",
+          "command": "pip-audit",
+          "on_failure": "warn",
+          "async": true
+        }
+      ]
+    }
+  ],
+  "configuration": {
+    "enabled": true,
+    "timeout_seconds": 60,
+    "parallel_execution": true
+  }
+}

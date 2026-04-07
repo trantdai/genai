@@ -1,0 +1,35 @@
+{
+  "_comment": "Local settings overrides. Copy to settings.local.json and customize.",
+
+  "permissions": {
+    "command_execution": {
+      "timeout_seconds": 600
+    },
+    "network_access": {
+      "allow_external": true,
+      "allowed_domains": ["your-private-registry.com", "internal.company.com"]
+    }
+  },
+
+  "command_restrictions": {
+    "allowed_commands": ["jupyter", "ipython", "conda", "npm"]
+  },
+
+  "file_restrictions": {
+    "editable_patterns": ["scripts/*.sh", "config/*.yaml"],
+    "max_file_size_mb": 25
+  },
+
+  "environment_variables": {
+    "allowed_read": ["DEBUG", "LOG_LEVEL", "YOUR_PROJECT_*", "CUSTOM_*"]
+  },
+
+  "project_structure": {
+    "test_directory": "test",
+    "docs_directory": "documentation"
+  },
+
+  "logging": {
+    "level": "DEBUG"
+  }
+}
