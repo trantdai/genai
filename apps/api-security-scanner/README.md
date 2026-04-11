@@ -161,6 +161,125 @@ cat report.json
 
 ---
 
+## 💻 Development Setup
+
+### Prerequisites
+
+- **Python 3.13+** - Required for modern type hints and async features
+- **pip** - Python package installer
+- **git** - Version control
+
+### Installation
+
+**1. Clone the repository**
+```bash
+git clone <repo-url>
+cd api-security-scanner
+```
+
+**2. Create and activate virtual environment**
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+**3. Install dependencies**
+```bash
+# Install development dependencies (includes production deps)
+make install-dev
+
+# Or install production dependencies only
+make install
+```
+
+**4. Verify installation**
+```bash
+# Check package is importable
+python -c "import api_security_scanner; print(api_security_scanner.__version__)"
+
+# Verify CLI command
+api-scanner --help
+```
+
+### Development Workflow
+
+The project uses a `Makefile` for common development tasks:
+
+```bash
+make help              # Show all available commands
+make format            # Format code with ruff
+make lint              # Run linting and type checks
+make security-check    # Run security linting with bandit
+make quality           # Run all quality checks (format, lint, type check, security)
+make test              # Run tests with coverage
+make test-unit         # Run unit tests only
+make test-integration  # Run integration tests only
+make test-coverage     # Generate HTML coverage report
+make clean             # Clean up generated files
+```
+
+**Typical development cycle:**
+```bash
+# 1. Format and check code quality
+make quality
+
+# 2. Run tests with coverage
+make test-coverage
+
+# 3. View coverage report
+open htmlcov/index.html  # macOS
+xdg-open htmlcov/index.html  # Linux
+start htmlcov/index.html  # Windows
+```
+
+### Testing
+
+The project uses `pytest` with async support and enforces **80% minimum coverage**:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=src/api_security_scanner --cov-report=html --cov-report=term
+
+# Run specific test file
+pytest tests/unit/test_scanner.py
+
+# Run with verbose output
+pytest -v
+
+# Run only unit tests
+pytest tests/unit -m unit
+
+# Run only integration tests
+pytest tests/integration -m integration
+
+# Run async tests
+pytest -k "async" --asyncio-mode=auto
+```
+
+### Configuration
+
+Copy the environment template and customize:
+
+```bash
+cp .env.example .env
+# Edit .env with your preferred settings
+```
+
+**Key configuration options:**
+- `LOG_LEVEL` - Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+- `DEFAULT_TIMEOUT` - Request timeout in seconds (default: 30)
+- `DEFAULT_CONCURRENCY` - Max concurrent requests (default: 10)
+- `MAX_ENDPOINTS` - Max endpoints to discover (default: 100)
+- `MAX_SCAN_DURATION` - Max scan duration in seconds (default: 300)
+- `DEFAULT_REPORT_PATH` - Default report output path
+
+**Note:** Never commit `.env` to version control. The `.gitignore` file is configured to exclude it.
+
+---
+
 ## 📊 Development Timeline
 
 ### Phase 1: Documentation (Current) ✅
