@@ -55,6 +55,12 @@ dmypy.json
 .env.local
 .env.*.local
 
+# Makefile Marker Files (local development only)
+# Note: requirements-lock.txt is NOT ignored - it should be committed!
+.deps-prod-installed
+.deps-dev-installed
+.venv-created
+
 # Logs
 *.log
 logs/
